@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Download Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --bg-elevated: #131318;
+            --card: #1a1a22;
+            --card-hover: #22222e;
+            --border: #2a2a38;
+            --fg: #e8e8ef;
+            --fg-muted: #8888a0;
+            --accent: #ff6b35;
+            --accent-glow: rgba(255,107,53,0.25);
+            --accent-soft: rgba(255,107,53,0.1);
+            --success: #22c55e;
+            --success-glow: rgba(34,197,94,0.2);
+            --error: #ef4444;
+            --error-glow: rgba(239,68,68,0.2);
+            --gradient-1: #ff6b35;
+            --gradient-2: #ff2d7b;
+            --gradient-3: #9333ea;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .bg-scene { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+        .bg-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.25; animation:orbFloat 20s ease-in-out infinite; }
+        .bg-orb:nth-child(1) { width:500px; height:500px; background:var(--gradient-1); top:-15%; left:-10%; animation-duration:18s; }
+        .bg-orb:nth-child(2) { width:400px; height:400px; background:var(--gradient-2); bottom:-10%; right:-5%; animation-duration:22s; animation-delay:-5s; }
+        .bg-orb:nth-child(3) { width:300px; height:300px; background:var(--gradient-3); top:40%; left:50%; animation-duration:25s; animation-delay:-10s; opacity:0.12; }
+        @keyframes orbFloat {
+            0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(40px,-30px) scale(1.05)} 50%{transform:translate(-20px,50px) scale(0.95)} 75%{transform:translate(30px,20px) scale(1.02)}
+        }
+        .bg-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px); background-size:60px 60px; }
+
+        .app-container { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:24px 20px 60px; }
+
+        header { display:flex; align-items:center; justify-content:space-between; padding:16px 0 36px; }
+        .logo-group { display:flex; align-items:center; gap:14px; }
+        .logo-icon { width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2),var(--gradient-3)); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; box-shadow:0 4px 20px var(--accent-glow); position:relative; overflow:hidden; }
+        .logo-icon::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.2)); border-radius:inherit; }
+        .logo-text { display:flex; flex-direction:column; gap:2px; }
+        .logo-text h1 { font-size:20px; font-weight:700; letter-spacing:-0.5px; }
+        .logo-text span { font-size:11px; font-weight:400; color:var(--fg-muted); letter-spacing:1.5px; text-transform:uppercase; }
+        .header-right { display:flex; gap:8px; }
+        .btn-icon { width:40px; height:40px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--card); color:var(--fg-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; font-size:15px; }
+        .btn-icon:hover { background:var(--card-hover); color:var(--fg); transform:translateY(-1px); }
+
+        .hero { text-align:center; margin-bottom:36px; }
+        .hero h2 { font-size:clamp(26px,5vw,40px); font-weight:700; line-height:1.15; letter-spacing:-1px; margin-bottom:10px; }
+        .hero h2 .hl { background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero p { color:var(--fg-muted); font-size:15px; max-width:460px; margin:0 auto; line-height:1.6; }
+
+        .input-area { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:6px; display:flex; gap:6px; margin-bottom:14px; transition:border-color 0.3s, box-shadow 0.3s; }
+        .input-area:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+        .input-area.error { border-color:var(--error); box-shadow:0 0 0 3px var(--error-glow); }
+        .input-area input { flex:1; background:none; border:none; outline:none; color:var(--fg); font-family:'JetBrains Mono',monospace; font-size:13px; padding:14px 16px; min-width:0; }
+        .input-area input::placeholder { color:var(--fg-muted); opacity:0.5; }
+        .btn-paste { padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--bg-elevated); color:var(--fg-muted); font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+        .btn-paste:hover { background:var(--card-hover); color:var(--fg); }
+        .btn-go { padding:14px 24px; border-radius:var(--radius-sm); border:none; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.25s; white-space:nowrap; display:flex; align-items:center; gap:8px; position:relative; overflow:hidden; }
+        .btn-go::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent); opacity:0; transition:opacity 0.25s; }
+        .btn-go:hover::before { opacity:1; }
+        .btn-go:hover { transform:translateY(-1px); box-shadow:0 6px 24px var(--accent-glow); }
+        .btn-go:active { transform:scale(0.97); }
+        .btn-go:disabled { opacity:0.5; cursor:not-allowed; transform:none!important; box-shadow:none!important; }
+        .btn-go .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; display:none; }
+        .btn-go.loading .spinner { display:block; }
+        .btn-go.loading .btn-text { display:none; }
+        @keyframes spin { to{transform:rotate(360deg)} }
+
+        .tip-bar { font-size:12px; color:var(--fg-muted); margin-bottom:32px; display:flex; align-items:center; gap:8px; }
+        .tip-bar i { color:var(--accent); font-size:11px; }
+        .tip-bar code { background:var(--bg-elevated); padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:11px; border:1px solid var(--border); }
+
+        /* Resultado */
+        .result-section { display:none; animation:fadeUp 0.4s ease; }
+        .result-section.visible { display:block; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+        .result-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:20px; }
+        .result-card-inner { display:flex; gap:0; }
+        .result-thumb-wrap { width:280px; min-height:280px; flex-shrink:0; background:var(--bg-elevated); position:relative; overflow:hidden; }
+        .result-thumb-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+        .result-thumb-wrap .type-badge-overlay { position:absolute; top:12px; left:12px; padding:4px 12px; border-radius:100px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+        .badge-photo { background:rgba(59,130,246,0.8); color:#fff; }
+        .badge-video { background:rgba(239,68,68,0.8); color:#fff; }
+        .badge-reel { background:rgba(245,158,11,0.8); color:#fff; }
+        .badge-carousel { background:rgba(168,85,247,0.8); color:#fff; }
+        .badge-story { background:rgba(34,197,94,0.8); color:#fff; }
+        .badge-unknown { background:rgba(136,136,160,0.8); color:#fff; }
+
+        .result-info { flex:1; padding:24px; display:flex; flex-direction:column; }
+        .result-info h3 { font-size:15px; font-weight:600; margin-bottom:6px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .result-info .meta-line { font-size:12px; color:var(--fg-muted); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+        .result-info .meta-line i { width:14px; text-align:center; font-size:11px; }
+        .result-info .caption { margin-top:12px; font-size:13px; color:var(--fg-muted); line-height:1.6; flex:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+        .result-actions { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+        .btn-dl { padding:12px 24px; border-radius:var(--radius-sm); border:none; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:8px; }
+        .btn-dl-primary { background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; flex:1; min-width:160px; justify-content:center; }
+        .btn-dl-primary:hover { box-shadow:0 6px 24px var(--accent-glow); transform:translateY(-1px); }
+        .btn-dl-secondary { background:var(--bg-elevated); color:var(--fg); border:1px solid var(--border); }
+        .btn-dl-secondary:hover { background:var(--card-hover); border-color:rgba(255,255,255,0.1); }
+        .btn-dl:disabled { opacity:0.4; cursor:not-allowed; transform:none!important; box-shadow:none!important; }
+
+        /* Carrossel */
+        .carousel-strip { display:flex; gap:10px; overflow-x:auto; padding:4px 0 12px; margin-bottom:20px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+        .carousel-strip::-webkit-scrollbar { height:4px; }
+        .carousel-strip::-webkit-scrollbar-thumb { background:var(--border); border-radius:100px; }
+        .carousel-item { width:140px; height:140px; border-radius:var(--radius-sm); overflow:hidden; flex-shrink:0; border:2px solid transparent; cursor:pointer; transition:all 0.2s; position:relative; }
+        .carousel-item:hover { border-color:rgba(255,255,255,0.15); transform:translateY(-2px); }
+        .carousel-item.selected { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
+        .carousel-item img { width:100%; height:100%; object-fit:cover; display:block; background:var(--bg-elevated); }
+        .carousel-item .ci-index { position:absolute; bottom:6px; right:6px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; }
+        .carousel-item .ci-video { position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; background:rgba(239,68,68,0.8); display:flex; align-items:center; justify-content:center; font-size:9px; color:#fff; }
+
+        /* Download múltiplo */
+        .multi-dl-bar { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+        .multi-dl-bar span { font-size:13px; color:var(--fg-muted); }
+        .multi-dl-bar span strong { color:var(--fg); }
+
+        /* Progresso */
+        .progress-section { display:none; margin-bottom:20px; animation:fadeUp 0.3s ease; }
+        .progress-section.visible { display:block; }
+        .progress-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:20px; }
+        .progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .progress-top .fname { font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--fg-muted); max-width:400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .progress-top .pct { font-size:14px; font-weight:700; color:var(--accent); font-family:'JetBrains Mono',monospace; }
+        .pbar-track { width:100%; height:6px; border-radius:100px; background:var(--bg-elevated); overflow:hidden; margin-bottom:8px; }
+        .pbar-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--gradient-1),var(--gradient-2)); width:0%; transition:width 0.12s ease; }
+        .pbar-details { display:flex; justify-content:space-between; font-size:11px; color:var(--fg-muted); font-family:'JetBrains Mono',monospace; }
+
+        /* Direto - lista de links */
+        .direct-links { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:20px; }
+        .direct-links-header { padding:16px 20px; border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+        .direct-links-header i { color:var(--accent); }
+        .direct-link-item { display:flex; align-items:center; gap:14px; padding:14px 20px; border-bottom:1px solid var(--border); transition:background 0.15s; }
+        .direct-link-item:last-child { border-bottom:none; }
+        .direct-link-item:hover { background:var(--card-hover); }
+        .direct-link-item img { width:48px; height:48px; border-radius:var(--radius-xs); object-fit:cover; background:var(--bg-elevated); flex-shrink:0; }
+        .direct-link-info { flex:1; min-width:0; }
+        .direct-link-info .dli-type { font-size:11px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px; }
+        .direct-link-info .dli-url { font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--fg-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .btn-dl-sm { padding:8px 16px; border-radius:var(--radius-xs); border:none; background:var(--accent); color:#fff; font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+        .btn-dl-sm:hover { box-shadow:0 4px 16px var(--accent-glow); transform:translateY(-1px); }
+
+        /* Stats */
+        .stats-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:36px; }
+        .stat-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; text-align:center; transition:all 0.2s; }
+        .stat-card:hover { border-color:rgba(255,255,255,0.08); transform:translateY(-2px); }
+        .stat-card .sv { font-size:22px; font-weight:700; margin-bottom:2px; font-family:'JetBrains Mono',monospace; }
+        .stat-card .sl { font-size:10px; color:var(--fg-muted); text-transform:uppercase; letter-spacing:0.8px; }
+        .stat-card:nth-child(1) .sv { color:var(--accent); }
+        .stat-card:nth-child(2) .sv { color:#60a5fa; }
+        .stat-card:nth-child(3) .sv { color:#f87171; }
+
+        /* Histórico */
+        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+        .section-header h3 { font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; }
+        .section-header h3 .cnt { padding:2px 8px; border-radius:100px; background:var(--accent-soft); color:var(--accent); font-size:11px; font-weight:700; }
+        .btn-clear { padding:5px 12px; border-radius:var(--radius-xs); border:1px solid var(--border); background:none; color:var(--fg-muted); font-family:'Space Grotesk',sans-serif; font-size:12px; cursor:pointer; transition:all 0.2s; }
+        .btn-clear:hover { background:var(--error-glow); border-color:var(--error); color:var(--error); }
+        .history-item { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; display:flex; align-items:center; gap:12px; margin-bottom:8px; transition:all 0.2s; animation:fadeUp 0.3s ease; }
+        .history-item:hover { background:var(--card-hover); }
+        .history-thumb { width:44px; height:44px; border-radius:var(--radius-xs); object-fit:cover; background:var(--bg-elevated); flex-shrink:0; }
+        .history-info { flex:1; min-width:0; }
+        .history-info .h-url { font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+        .history-info .h-meta { font-size:11px; color:var(--fg-muted); display:flex; gap:10px; }
+        .history-actions { display:flex; gap:5px; flex-shrink:0; }
+        .history-actions button { width:30px; height:30px; border-radius:var(--radius-xs); border:1px solid var(--border); background:var(--bg-elevated); color:var(--fg-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all 0.2s; }
+        .history-actions .h-redl:hover { color:var(--accent); border-color:var(--accent); }
+        .history-actions .h-del:hover { color:var(--error); border-color:var(--error); }
+        .empty-state { text-align:center; padding:40px 20px; color:var(--fg-muted); }
+        .empty-state i { font-size:32px; margin-bottom:10px; opacity:0.25; display:block; }
+        .empty-state p { font-size:13px; }
+
+        /* Toast */
+        .toast-container { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+        .toast { padding:12px 18px; border-radius:var(--radius-sm); background:var(--card); border:1px solid var(--border); color:var(--fg); font-size:13px; font-family:'Space Grotesk',sans-serif; box-shadow:var(--shadow-lg); display:flex; align-items:center; gap:10px; animation:toastIn 0.3s ease; max-width:360px; backdrop-filter:blur(12px); pointer-events:auto; }
+        .toast.success { border-color:var(--success); } .toast.success i { color:var(--success); }
+        .toast.error { border-color:var(--error); } .toast.error i { color:var(--error); }
+        .toast.info { border-color:var(--accent); } .toast.info i { color:var(--accent); }
+        .toast.removing { animation:toastOut 0.25s ease forwards; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes toastOut { to{opacity:0;transform:translateX(40px)} }
+
+        /* Status de busca */
+        .fetch-status { display:none; text-align:center; padding:60px 20px; animation:fadeUp 0.3s ease; }
+        .fetch-status.visible { display:block; }
+        .fetch-status .fs-icon { font-size:40px; margin-bottom:16px; opacity:0.4; animation:pulse 1.5s ease-in-out infinite; }
+        .fetch-status .fs-text { font-size:15px; color:var(--fg-muted); margin-bottom:6px; }
+        .fetch-status .fs-sub { font-size:12px; color:var(--fg-muted); opacity:0.6; font-family:'JetBrains Mono',monospace; }
+        @keyframes pulse { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.05)} }
+
+        footer { text-align:center; padding:28px 0 0; border-top:1px solid var(--border); margin-top:20px; }
+        footer p { font-size:11px; color:var(--fg-muted); line-height:1.8; }
+
+        @media (max-width:640px) {
+            .input-area { flex-direction:column; }
+            .btn-paste,.btn-go { width:100%; justify-content:center; }
+            .result-card-inner { flex-direction:column; }
+            .result-thumb-wrap { width:100%; min-height:220px; max-height:280px; }
+            .stats-bar { grid-template-columns:repeat(3,1fr); }
+            .carousel-item { width:110px; height:110px; }
+        }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:100px; }
+    </style>
+</head>
+<body>
+
+<div class="bg-scene" aria-hidden="true">
+    <div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div>
+    <div class="bg-grid"></div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<div class="app-container">
+    <header>
+        <div class="logo-group">
+            <div class="logo-icon"><i class="fab fa-instagram"></i></div>
+            <div class="logo-text"><h1>IG Download Pro</h1><span>Baixador de midia</span></div>
+        </div>
+        <div class="header-right">
+            <button class="btn-icon" onclick="clearAll()" aria-label="Limpar tudo" title="Limpar resultado"><i class="fas fa-rotate-left"></i></button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h2>Baixe qualquer midia do <span class="hl">Instagram</span></h2>
+        <p>Cole o link real de qualquer post, reel ou story. A ferramenta busca os dados diretamente da pagina.</p>
+    </section>
+
+    <div class="input-area" id="inputArea">
+        <input type="url" id="urlInput" placeholder="https://www.instagram.com/p/ABC123..." aria-label="URL do Instagram" autocomplete="off" spellcheck="false">
+        <button class="btn-paste" onclick="pasteFromClipboard()" aria-label="Colar"><i class="fas fa-paste"></i> Colar</button>
+        <button class="btn-go" id="btnGo" onclick="analyzeUrl()" aria-label="Buscar midia">
+            <div class="spinner"></div>
+            <span class="btn-text"><i class="fas fa-download"></i> Buscar</span>
+        </button>
+    </div>
+
+    <div class="tip-bar">
+        <i class="fas fa-lightbulb"></i>
+        Funciona com: <code>/p/</code> posts, <code>/reel/</code> reels, <code>/tv/</code> IGTV. Cole o link exato que copiou do app.
+    </div>
+
+    <!-- Status de busca -->
+    <div class="fetch-status" id="fetchStatus">
+        <div class="fs-icon"><i class="fas fa-satellite-dish"></i></div>
+        <div class="fs-text" id="fsText">Buscando dados da pagina...</div>
+        <div class="fs-sub" id="fsSub">Conectando via proxy</div>
+    </div>
+
+    <!-- Resultado -->
+    <section class="result-section" id="resultSection" aria-label="Resultado">
+        <div class="result-card" id="resultCard"></div>
+        <div class="carousel-strip" id="carouselStrip"></div>
+        <div class="multi-dl-bar" id="multiDlBar" style="display:none"></div>
+        <div class="direct-links" id="directLinks"></div>
+    </section>
+
+    <!-- Progresso -->
+    <div class="progress-section" id="progressSection">
+        <div class="progress-card">
+            <div class="progress-top">
+                <span class="fname" id="progressFile">baixando...</span>
+                <span class="pct" id="progressPct">0%</span>
+            </div>
+            <div class="pbar-track"><div class="pbar-fill" id="progressFill"></div></div>
+            <div class="pbar-details">
+                <span id="progressSpeed">Preparando...</span>
+                <span id="progressEta"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-card"><div class="sv" id="statTotal">0</div><div class="sl">Downloads</div></div>
+        <div class="stat-card"><div class="sv" id="statPhotos">0</div><div class="sl">Fotos</div></div>
+        <div class="stat-card"><div class="sv" id="statVideos">0</div><div class="sl">Videos</div></div>
+    </div>
+
+    <!-- Historico -->
+    <section aria-label="Historico">
+        <div class="section-header">
+            <h3><i class="fas fa-clock-rotate-left"></i> Historico <span class="cnt" id="historyCount">0</span></h3>
+            <button class="btn-clear" onclick="clearHistory()"><i class="fas fa-trash-can"></i> Limpar</button>
+        </div>
+        <div id="historyList">
+            <div class="empty-state" id="emptyHistory"><i class="fas fa-inbox"></i><p>Nenhum download ainda</p></div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Instagram Download Pro — Usa CORS proxy para buscar metadados da pagina.<br>Os arquivos vem direto do CDN do Instagram. Nenhum dado e armazenado em servidores terceiros.</p>
+    </footer>
+</div>
+
+<script>
+// ===== CORS PROXIES (fallbacks) =====
+const PROXIES = [
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+];
+
+// ===== ESTADO =====
+let state = {
+    history: JSON.parse(localStorage.getItem('igdl_hist') || '[]'),
+    stats: JSON.parse(localStorage.getItem('igdl_stats') || '{"total":0,"photos":0,"videos":0}'),
+    busy: false,
+    currentData: null
+};
+
+// ===== VALIDAÇÃO =====
+function isValidIGUrl(url) {
+    return /^https?:\/\/(www\.)?instagram\.com\/(p|reel|reels|tv)\/[\w-]+\/?/i.test(url.trim());
+}
+
+function detectUrlType(url) {
+    const u = url.toLowerCase();
+    if (u.includes('/reel')) return 'reel';
+    if (u.includes('/tv/')) return 'video';
+    return 'post';
+}
+
+// ===== COLAR =====
+async function pasteFromClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('urlInput').value = text;
+        document.getElementById('inputArea').classList.remove('error');
+        showToast('Link colado', 'success');
+    } catch {
+        showToast('Nao foi possivel acessar a area de transferencia. Cole manualmente com Ctrl+V.', 'error');
+    }
+}
+
+// ===== BUSCAR PÁGINA VIA PROXY =====
+async function fetchPage(url) {
+    for (let i = 0; i < PROXIES.length; i++) {
+        const proxyUrl = PROXIES[i](url);
+        updateFetchStatus(`Buscando dados da pagina...`, `Proxy ${i + 1}/${PROXIES.length}`);
+        try {
+            const resp = await fetch(proxyUrl, {
+                signal: AbortSignal.timeout(15000)
+            });
+            if (!resp.ok) continue;
+            const html = await resp.text();
+            if (html.length < 500) continue;
+            return html;
+        } catch (e) {
+            console.warn(`Proxy ${i + 1} falhou:`, e.message);
+            continue;
+        }
+    }
+    throw new Error('Todos os proxies falharam');
+}
+
+// ===== EXTRAIR METADADOS DO HTML =====
+function extractMeta(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    const getMeta = (prop) => {
+        const el = doc.querySelector(`meta[property="${prop}"]`) || doc.querySelector(`meta[name="${prop}"]`);
+        return el ? el.getAttribute('content') : null;
+    };
+
+    const ogImage = getMeta('og:image');
+    const ogVideo = getMeta('og:video:secure_url') || getMeta('og:video');
+    const ogType = getMeta('og:type');
+    const ogTitle = getMeta('og:title');
+    const ogDesc = getMeta('og:description');
+    const ogUrl = getMeta('og:url');
+
+    // Tentar extrair dados JSON dos scripts
+    let jsonData = null;
+    const scripts = doc.querySelectorAll('script');
+    for (const s of scripts) {
+        const t = s.textContent;
+        // Padrão antigo: window._sharedData
+        if (t.includes('window._sharedData')) {
+            try {
+                const m = t.match(/window\._sharedData\s*=\s*({.+?});\s*<\/script>/s);
+                if (m) jsonData = JSON.parse(m[1]);
+            } catch {}
+        }
+        // Padrão mais recente: arquivo JSON embutido
+        if (t.includes('"shortcode"') && t.includes('"display_url"')) {
+            try {
+                const du = t.match(/"display_url"\s*:\s*"([^"]+)"/);
+                const vu = t.match(/"video_url"\s*:\s*"([^"]+)"/);
+                const w = t.match(/"original_width"\s*:\s*(\d+)/);
+                const h = t.match(/"original_height"\s*:\s*(\d+)/);
+                const iv = t.match(/"is_video"\s*:\s*(true|false)/);
+                const carousel = t.match(/"edge_sidecar_to_children"/);
+                if (!jsonData) jsonData = {};
+                if (du) jsonData._displayUrl = du[1].replace(/\\u0026/g, '&');
+                if (vu) jsonData._videoUrl = vu[1].replace(/\\u0026/g, '&');
+                if (w) jsonData._width = parseInt(w[1]);
+                if (h) jsonData._height = parseInt(h[1]);
+                if (iv) jsonData._isVideo = iv[1] === 'true';
+                if (carousel) jsonData._isCarousel = true;
+
+                // Extrair items do carrossel
+                if (carousel) {
+                    const items = [];
+                    const regex = /"display_url"\s*:\s*"([^"]+)"/g;
+                    let match;
+                    while ((match = regex.exec(t)) !== null) {
+                        items.push(match[1].replace(/\\u0026/g, '&'));
+                    }
+                    const videoUrls = [];
+                    const vregex = /"video_url"\s*:\s*"([^"]+)"/g;
+                    while ((match = vregex.exec(t)) !== null) {
+                        videoUrls.push(match[1].replace(/\\u0026/g, '&'));
+                    }
+                    jsonData._carouselImages = items;
+                    jsonData._carouselVideos = videoUrls;
+                }
+            } catch {}
+        }
+    }
+
+    const isVideo = ogType === 'video.other' || !!ogVideo || (jsonData && jsonData._isVideo);
+    const isCarousel = jsonData && (jsonData._isCarousel || (jsonData._carouselImages && jsonData._carouselImages.length > 1));
+
+    let type = 'photo';
+    if (isCarousel) type = 'carousel';
+    else if (isVideo) type = 'video';
+
+    // Determinar tipo baseado na URL também
+    const urlType = detectUrlType(ogUrl || '');
+    if (urlType === 'reel' && isVideo) type = 'reel';
+
+    // Construir lista de mídias
+    let mediaItems = [];
+
+    if (isCarousel && jsonData && jsonData._carouselImages) {
+        const imgs = jsonData._carouselImages;
+        const vids = jsonData._carouselVideos || [];
+        for (let i = 0; i < imgs.length; i++) {
+            const isVid = vids.length > 0 && i < vids.length;
+            mediaItems.push({
+                type: isVid ? 'video' : 'photo',
+                url: isVid ? vids[i] : imgs[i],
+                thumbnail: imgs[i],
+                index: i
+            });
+        }
+    } else {
+        const mediaUrl = (jsonData && jsonData._videoUrl) || ogVideo || (jsonData && jsonData._displayUrl) || ogImage;
+        mediaItems.push({
+            type: isVideo ? 'video' : 'photo',
+            url: mediaUrl,
+            thumbnail: ogImage || mediaUrl,
+            index: 0
+        });
+    }
+
+    return {
+        type,
+        title: ogTitle || 'Midia do Instagram',
+        description: ogDesc || '',
+        thumbnail: ogImage,
+        mediaItems,
+        isVideo,
+        isCarousel: !!isCarousel,
+        url: ogUrl,
+        width: (jsonData && jsonData._width) || 1080,
+        height: (jsonData && jsonData._height) || 1080
+    };
+}
+
+// ===== ANÁLISE PRINCIPAL =====
+async function analyzeUrl() {
+    const url = document.getElementById('urlInput').value.trim();
+    const inputArea = document.getElementById('inputArea');
+    const btn = document.getElementById('btnGo');
+
+    if (!url) {
+        inputArea.classList.add('error');
+        showToast('Cole um link do Instagram primeiro', 'error');
+        setTimeout(() => inputArea.classList.remove('error'), 2000);
+        return;
+    }
+
+    if (!isValidIGUrl(url)) {
+        inputArea.classList.add('error');
+        showToast('URL invalida. Precisa ser instagram.com/p/, /reel/ ou /tv/', 'error');
+        setTimeout(() => inputArea.classList.remove('error'), 3000);
+        return;
+    }
+
+    inputArea.classList.remove('error');
+    if (state.busy) return;
+    state.busy = true;
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    // Esconder resultado anterior, mostrar status
+    document.getElementById('resultSection').classList.remove('visible');
+    document.getElementById('progressSection').classList.remove('visible');
+    document.getElementById('fetchStatus').classList.add('visible');
+
+    try {
+        const html = await fetchPage(url);
+        updateFetchStatus('Processando dados...', 'Extraindo metadados');
+        await delay(300);
+
+        const data = extractMeta(html);
+        state.currentData = { ...data, sourceUrl: url, timestamp: Date.now() };
+
+        if (!data.thumbnail && data.mediaItems.length === 0) {
+            throw new Error('Nenhuma midia encontrada. A pagina pode ser privada ou o link estar quebrado.');
+        }
+
+        document.getElementById('fetchStatus').classList.remove('visible');
+        renderResult(data);
+        showToast(`${data.mediaItems.length} midia(s) encontrada(s)`, 'success');
+
+    } catch (err) {
+        document.getElementById('fetchStatus').classList.remove('visible');
+        console.error('Erro na análise:', err);
+
+        if (err.message.includes('falharam')) {
+            showToast('Proxies indisponiveis. Tente novamente em alguns segundos.', 'error');
+        } else if (err.message.includes('timeout') || err.name === 'TimeoutError') {
+            showToast('Tempo esgotado. O Instagram pode estar bloqueando a requisicao.', 'error');
+        } else {
+            showToast(err.message || 'Erro ao buscar a pagina', 'error');
+        }
+    }
+
+    state.busy = false;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+}
+
+// ===== RENDERIZAR RESULTADO =====
+function renderResult(data) {
+    // Card principal
+    const card = document.getElementById('resultCard');
+    const badgeCls = { photo: 'badge-photo', video: 'badge-video', reel: 'badge-reel', carousel: 'badge-carousel' };
+    const badgeLabel = { photo: 'Foto', video: 'Video', reel: 'Reel', carousel: 'Carrossel' };
+    const typeIcon = { photo: 'fa-image', video: 'fa-video', reel: 'fa-film', carousel: 'fa-layer-group' };
+
+    const firstItem = data.mediaItems[0];
+    const thumbSrc = data.thumbnail || firstItem.thumbnail || '';
+
+    card.innerHTML = `
+        <div class="result-card-inner">
+            <div class="result-thumb-wrap">
+                ${thumbSrc ? `<img src="${thumbSrc}" alt="Preview" onerror="this.style.display='none'">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--fg-muted);font-size:48px;opacity:0.2"><i class="fas fa-image"></i></div>'}
+                <span class="type-badge-overlay ${badgeCls[data.type] || 'badge-unknown'}">${badgeLabel[data.type] || data.type}</span>
+            </div>
+            <div class="result-info">
+                <h3>${escapeHtml(data.title)}</h3>
+                <div class="meta-line"><i class="fas ${typeIcon[data.type] || 'fa-circle'}"></i> ${badgeLabel[data.type] || 'Midia'}</div>
+                <div class="meta-line"><i class="fas fa-expand"></i> ${data.width}x${data.height}</div>
+                <div class="meta-line"><i class="fas fa-copy"></i> ${data.mediaItems.length} arquivo(s)</div>
+                ${data.description ? `<div class="caption">${escapeHtml(data.description)}</div>` : ''}
+                <div class="result-actions">
+                    <button class="btn-dl btn-dl-primary" onclick="downloadMedia(0)">
+                        <i class="fas fa-download"></i> Baixar${data.isVideo ? ' video' : ' foto'}
+                    </button>
+                    ${data.url ? `<button class="btn-dl btn-dl-secondary" onclick="window.open('${data.url}','_blank')"><i class="fas fa-external-link-alt"></i> Abrir</button>` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Carrossel
+    const strip = document.getElementById('carouselStrip');
+    if (data.isCarousel && data.mediaItems.length > 1) {
+        strip.innerHTML = data.mediaItems.map((item, i) => `
+            <div class="carousel-item${i === 0 ? ' selected' : ''}" data-idx="${i}" onclick="selectCarouselItem(${i})" tabindex="0" role="button" aria-label="Item ${i + 1}">
+                <img src="${item.thumbnail}" alt="Item ${i + 1}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22><rect fill=%22%231a1a22%22 width=%22140%22 height=%22140%22/><text x=%2270%22 y=%2275%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2232%22>${i + 1}</text></svg>'">
+                <span class="ci-index">${i + 1}</span>
+                ${item.type === 'video' ? '<span class="ci-video"><i class="fas fa-play"></i></span>' : ''}
+            </div>
+        `).join('');
+        strip.style.display = 'flex';
+    } else {
+        strip.style.display = 'none';
+    }
+
+    // Links diretos
+    const linksDiv = document.getElementById('directLinks');
+    if (data.mediaItems.length > 0) {
+        linksDiv.innerHTML = `
+            <div class="direct-links-header"><i class="fas fa-link"></i> Links diretos para download</div>
+            ${data.mediaItems.map((item, i) => `
+                <div class="direct-link-item">
+                    <img src="${item.thumbnail}" alt="" onerror="this.style.background='var(--bg-elevated)'">
+                    <div class="direct-link-info">
+                        <div class="dli-type">${item.type === 'video' ? 'Video' : 'Foto'} #${i + 1}</div>
+                        <div class="dli-url" title="${escapeHtml(item.url)}">${escapeHtml(item.url || 'N/A')}</div>
+                    </div>
+                    <button class="btn-dl-sm" onclick="downloadMedia(${i})"><i class="fas fa-download"></i> Baixar</button>
+                </div>
+            `).join('')}
+        `;
+    } else {
+        linksDiv.innerHTML = '';
+    }
+
+    document.getElementById('resultSection').classList.add('visible');
+}
+
+// ===== SELEÇÃO CARROSSEL =====
+function selectCarouselItem(idx) {
+    document.querySelectorAll('.carousel-item').forEach(el => el.classList.remove('selected'));
+    const target = document.querySelector(`.carousel-item[data-idx="${idx}"]`);
+    if (target) target.classList.add('selected');
+
+    // Atualizar card principal
+    if (state.currentData) {
+        const item = state.currentData.mediaItems[idx];
+        if (item) {
+            const thumb = document.querySelector('.result-thumb-wrap img');
+            if (thumb) thumb.src = item.thumbnail;
+        }
+    }
+}
+
+// ===== DOWNLOAD REAL =====
+async function downloadMedia(index) {
+    if (!state.currentData || !state.currentData.mediaItems[index]) return;
+    const item = state.currentData.mediaItems[index];
+    const url = item.url;
+
+    if (!url) {
+        showToast('URL de download nao disponivel para este item', 'error');
+        return;
+    }
+
+    const ext = item.type === 'video' ? 'mp4' : 'jpg';
+    const filename = `instagram_${Date.now()}_${index + 1}.${ext}`;
+
+    // Mostrar progresso
+    const pSection = document.getElementById('progressSection');
+    const pFile = document.getElementById('progressFile');
+    const pPct = document.getElementById('progressPct');
+    const pFill = document.getElementById('progressFill');
+    const pSpeed = document.getElementById('progressSpeed');
+    const pEta = document.getElementById('progressEta');
+
+    pSection.classList.add('visible');
+    pFile.textContent = filename;
+    pFill.style.width = '0%';
+    pPct.textContent = '0%';
+    pSpeed.textContent = 'Conectando...';
+    pEta.textContent = '';
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const contentLength = response.headers.get('content-length');
+        const total = contentLength ? parseInt(contentLength) : 0;
+        let loaded = 0;
+
+        const reader = response.body.getReader();
+        const chunks = [];
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            loaded += value.length;
+
+            if (total > 0) {
+                const pct = Math.round((loaded / total) * 100);
+                pFill.style.width = pct + '%';
+                pPct.textContent = pct + '%';
+                const mb = (loaded / 1048576).toFixed(1);
+                const totalMb = (total / 1048576).toFixed(1);
+                pSpeed.textContent = `${mb} / ${totalMb} MB`;
+            } else {
+                // Sem content-length, mostrar progresso indeterminado
+                const mb = (loaded / 1048576).toFixed(1);
+                pSpeed.textContent = `${mb} MB baixados`;
+                pFill.style.width = '60%';
+                pPct.textContent = '...';
+            }
+        }
+
+        pFill.style.width = '100%';
+        pPct.textContent = '100%';
+        pSpeed.textContent = 'Finalizando...';
+
+        const blob = new Blob(chunks);
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+        // Atualizar stats e histórico
+        state.stats.total++;
+        if (item.type === 'video') state.stats.videos++;
+        else state.stats.photos++;
+        localStorage.setItem('igdl_stats', JSON.stringify(state.stats));
+        renderStats();
+
+        addHistory(state.currentData.sourceUrl, item, filename);
+
+        showToast(`"${filename}" baixado com sucesso`, 'success');
+
+        await delay(1200);
+        pSection.classList.remove('visible');
+
+    } catch (err) {
+        console.error('Erro no download:', err);
+        pSection.classList.remove('visible');
+
+        // Fallback: abrir em nova aba
+        showToast('Download direto bloqueado pelo navegador. Abrindo em nova aba...', 'info');
+        await delay(500);
+        window.open(url, '_blank');
+
+        // Mesmo assim registrar no histórico
+        addHistory(state.currentData.sourceUrl, item, filename);
+        state.stats.total++;
+        if (item.type === 'video') state.stats.videos++;
+        else state.stats.photos++;
+        localStorage.setItem('igdl_stats', JSON.stringify(state.stats));
+        renderStats();
+    }
+}
+
+// ===== HISTÓRICO =====
+function addHistory(url, item, filename) {
+    const entry = {
+        id: Date.now(),
+        url: url,
+        type: item.type,
+        thumbnail: item.thumbnail || '',
+        filename: filename,
+        timestamp: new Date().toISOString()
+    };
+    state.history.unshift(entry);
+    if (state.history.length > 30) state.history.pop();
+    localStorage.setItem('igdl_hist', JSON.stringify(state.history));
+    renderHistory();
+}
+
+function renderHistory() {
+    const container = document.getElementById('historyList');
+    const empty = document.getElementById('emptyHistory');
+    document.getElementById('historyCount').textContent = state.history.length;
+
+    if (state.history.length === 0) {
+        container.innerHTML = '';
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-state';
+        emptyDiv.id = 'emptyHistory';
+        emptyDiv.innerHTML = '<i class="fas fa-inbox"></i><p>Nenhum download ainda</p>';
+        container.appendChild(emptyDiv);
+        return;
+    }
+
+    container.innerHTML = state.history.map((h, i) => {
+        const icon = h.type === 'video' ? 'fa-video' : 'fa-image';
+        const time = timeAgo(h.timestamp);
+        return `
+            <div class="history-item">
+                ${h.thumbnail ? `<img class="history-thumb" src="${h.thumbnail}" alt="" onerror="this.style.display='none'">` : `<div class="history-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--fg-muted);font-size:16px;background:var(--bg-elevated)"><i class="fas ${icon}"></i></div>`}
+                <div class="history-info">
+                    <div class="h-url">${escapeHtml(h.url)}</div>
+                    <div class="h-meta"><span><i class="fas ${icon}"></i> ${h.type}</span><span>${time}</span></div>
+                </div>
+                <div class="history-actions">
+                    <button class="h-redl" onclick="redownload(${i})" title="Baixar novamente" aria-label="Baixar novamente"><i class="fas fa-redo"></i></button>
+                    <button class="h-del" onclick="deleteHistory(${i})" title="Remover" aria-label="Remover"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function deleteHistory(i) {
+    state.history.splice(i, 1);
+    localStorage.setItem('igdl_hist', JSON.stringify(state.history));
+    renderHistory();
+}
+
+function clearHistory() {
+    if (state.history.length === 0) return;
+    state.history = [];
+    localStorage.setItem('igdl_hist', JSON.stringify(state.history));
+    renderHistory();
+    showToast('Historico limpo', 'info');
+}
+
+function redownload(i) {
+    const item = state.history[i];
+    if (item && item.url) {
+        document.getElementById('urlInput').value = item.url;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        analyzeUrl();
+    }
+}
+
+// ===== STATS =====
+function renderStats() {
+    document.getElementById('statTotal').textContent = state.stats.total;
+    document.getElementById('statPhotos').textContent = state.stats.photos;
+    document.getElementById('statVideos').textContent = state.stats.videos;
+}
+
+// ===== LIMPAR TUDO =====
+function clearAll() {
+    document.getElementById('urlInput').value = '';
+    document.getElementById('resultSection').classList.remove('visible');
+    document.getElementById('progressSection').classList.remove('visible');
+    document.getElementById('fetchStatus').classList.remove('visible');
+    state.currentData = null;
+}
+
+// ===== FETCH STATUS =====
+function updateFetchStatus(text, sub) {
+    document.getElementById('fsText').textContent = text;
+    document.getElementById('fsSub').textContent = sub;
+}
+
+// ===== UTILITÁRIOS =====
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    if (diff < 60000) return 'agora';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}min atras`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h atras`;
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+}
+
+function showToast(msg, type = 'info') {
+    const c = document.getElementById('toastContainer');
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<i class="fas ${icons[type]}"></i> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, 3500);
+}
+
+// ===== ATALHOS =====
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.activeElement === document.getElementById('urlInput')) analyzeUrl();
+    if (e.key === 'Escape') clearAll();
+});
+
+// ===== INIT =====
+renderStats();
+renderHistory();
+</script>
+</body>
+</html>
