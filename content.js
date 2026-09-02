@@ -375,7 +375,7 @@
         lastH=location.href;
         if(panel.classList.contains("open")){
           if(isReelUrl()){mode="reel";let v=findVid();if(v){curEl=v;loadVid(v)}else showEmpty("Role ate um reel.")}
-          else if(isPostUrl()){mode="post";returnToOrig();scanWithRetry().then(f=>{if(f)loadPhoto(0);else showEmpty("Nenhuma midia. Clique em atualizar.")})
+          else if(isPostUrl()){mode="post";returnToOrig();scanWithRetry().then(f=>{if(f)loadPhoto(0);else showEmpty("Nenhuma midia. Clique em atualizar.")})}
           else{mode="reel";let v=findVid();if(v){curEl=v;loadVid(v)}else showEmpty("Navegue ate um post ou reel.")}
         }
         posCap();
