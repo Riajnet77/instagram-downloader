@@ -220,7 +220,7 @@
     .is-fab{position:fixed;right:14px;bottom:14px;z-index:2147482999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888);box-shadow:0 4px 16px rgba(220,39,67,.4);transition:transform .15s}
     .is-fab:hover{transform:scale(1.1)}
 
-    .is-p{position:fixed;bottom:16px;right:16px;width:340px;max-width:calc(100vw - 32px);z-index:2147483001;display:flex;flex-direction:column;background:rgb(12,12,16);border:1px solid rgba(255,255,255,.06);font:11px/1.3 system-ui,sans-serif;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03);user-select:none;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.97);transition:all .3s cubic-bezier(.4,0,.2,1)}
+    .is-p{position:fixed;bottom:16px;right:16px;width:340px;max-width:calc(100vw - 32px);max-height:340px;z-index:2147483001;display:flex;flex-direction:column;background:rgb(12,12,16);border:1px solid rgba(255,255,255,.06);font:11px/1.3 system-ui,sans-serif;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03);user-select:none;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.97);transition:all .3s cubic-bezier(.4,0,.2,1)}
     .is-p.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
     .is-p.fs{width:min(92vw,640px);bottom:12px;right:12px;border-radius:14px}
 
@@ -334,7 +334,7 @@
     $(".is-cap").addEventListener("click",openP);
     $(".is-x").addEventListener("click",closeP);
     $(".is-pb").addEventListener("click",()=>{if(panelVid&&panelVid.tagName==="VIDEO")panelVid.paused?panelVid.play().catch(()=>{}):panelVid.pause()});
-    $(".is-bar").addEventListener("input",()=>{if(panelVid&&panelVid.tagName==="VIDEO"&&isFinite(panelVid.duration))panelVid.currentTime=parseFloat($(".is-bar").value});
+    $(".is-bar").addEventListener("input",()=>{if(panelVid&&panelVid.tagName==="VIDEO"&&isFinite(panelVid.duration))panelVid.currentTime=parseFloat($(".is-bar").value)});
     $(".is-sp").addEventListener("change",()=>{if(panelVid&&panelVid.tagName==="VIDEO"){panelVid.playbackRate=parseFloat($(".is-sp").value);updateInfo()}});
     $(".is-dl").addEventListener("click",dlCur);
     $(".is-da").addEventListener("click",dlAll);
@@ -375,7 +375,7 @@
         lastH=location.href;
         if(panel.classList.contains("open")){
           if(isReelUrl()){mode="reel";let v=findVid();if(v){curEl=v;loadVid(v)}else showEmpty("Role ate um reel.")}
-          else if(isPostUrl()){mode="post";returnToOrig();scanWithRetry().then(f=>{if(f)loadPhoto(0);else showEmpty("Nenhuma midia. Clique em atualizar.")})
+          else if(isPostUrl()){mode="post";returnToOrig();scanWithRetry().then(f=>{if(f)loadPhoto(0);else showEmpty("Nenhuma midia. Clique em atualizar.")})}
           else{mode="reel";let v=findVid();if(v){curEl=v;loadVid(v)}else showEmpty("Navegue ate um post ou reel.")}
         }
         posCap();
