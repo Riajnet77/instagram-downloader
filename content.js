@@ -166,7 +166,7 @@
         let vi=m.type==="video"?'<span style="position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;color:#fff;font-size:6px">&#9654;</span>':"";
         return`<div class="is-si${i===photoIdx?" act":""}" data-i="${i}" style="${bg}">${vi}</div>`;
       }).join("");
-      strip.querySelectorAll(".is-si").forEach(el=>{el.addEventListener("click",()=>loadPhoto(parseInt(el.dataset.i))});
+      strip.querySelectorAll(".is-si").forEach(el=>{el.addEventListener("click",()=>loadPhoto(parseInt(el.dataset.i)))});
       dlA.style.display="inline-flex";dlA.innerHTML=I.dl+" Todos ("+photos.length+")";
     } else {strip.style.display="none";dlA.style.display="none"}
     updateInfo();
@@ -220,7 +220,7 @@
     .is-fab{position:fixed;right:14px;bottom:14px;z-index:2147482999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888);box-shadow:0 4px 16px rgba(220,39,67,.4);transition:transform .15s}
     .is-fab:hover{transform:scale(1.1)}
 
-    .is-p{position:fixed;bottom:16px;right:16px;width:340px;max-width:calc(100vw - 32px);z-index:2147483001;display:flex;flex-direction:column;background:rgb(12,12,16);border:1px solid rgba(255,255,255,.06);font:11px/1.3 system-ui,sans-serif;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03);user-select:none;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.97);transition:all .3s cubic-bezier(.4,0,.2,1)}
+    .is-p{position:fixed;bottom:16px;right:16px;width:340px;max-width:calc(100vw - 32px);max-height:340px;z-index:2147483001;display:flex;flex-direction:column;background:rgb(12,12,16);border:1px solid rgba(255,255,255,.06);font:11px/1.3 system-ui,sans-serif;box-shadow:0 16px 56px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.03);user-select:none;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.97);transition:all .3s cubic-bezier(.4,0,.2,1)}
     .is-p.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
     .is-p.fs{width:min(92vw,640px);bottom:12px;right:12px;border-radius:14px}
 
