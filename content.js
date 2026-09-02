@@ -334,7 +334,7 @@
     $(".is-cap").addEventListener("click",openP);
     $(".is-x").addEventListener("click",closeP);
     $(".is-pb").addEventListener("click",()=>{if(panelVid&&panelVid.tagName==="VIDEO")panelVid.paused?panelVid.play().catch(()=>{}):panelVid.pause()});
-    $(".is-bar").addEventListener("input",()=>{if(panelVid&&panelVid.tagName==="VIDEO"&&isFinite(panelVid.duration))panelVid.currentTime=parseFloat($(".is-bar").value});
+    $(".is-bar").addEventListener("input",()=>{if(panelVid&&panelVid.tagName==="VIDEO"&&isFinite(panelVid.duration))panelVid.currentTime=parseFloat($(".is-bar").value)});
     $(".is-sp").addEventListener("change",()=>{if(panelVid&&panelVid.tagName==="VIDEO"){panelVid.playbackRate=parseFloat($(".is-sp").value);updateInfo()}});
     $(".is-dl").addEventListener("click",dlCur);
     $(".is-da").addEventListener("click",dlAll);
